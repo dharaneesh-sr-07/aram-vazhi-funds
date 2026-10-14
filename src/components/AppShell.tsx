@@ -34,7 +34,7 @@ export function AppShell({ me, nav, title, children }: { me: Me; nav: NavItem[];
           <Link
             key={n.to}
             to={n.to}
-            activeOptions={{ exact: n.exact }}
+            activeOptions={{ exact: n.exact ?? false }}
             onClick={() => setOpen(false)}
             className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors hover:bg-sidebar-accent"
             activeProps={{ className: "bg-sidebar-accent text-sidebar-primary font-semibold" }}

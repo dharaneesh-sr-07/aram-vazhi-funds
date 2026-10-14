@@ -14,7 +14,9 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AdminLoginRouteImport } from './routes/admin-login'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as MemberLoginRouteImport } from './routes/member-login'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedChangePasswordRouteImport } from './routes/_authenticated/change-password'
+import { Route as AuthenticatedMemberRouteImport } from './routes/_authenticated/member'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -40,26 +42,40 @@ const MemberLoginRoute = MemberLoginRouteImport.update({
   path: '/member-login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedChangePasswordRoute =
   AuthenticatedChangePasswordRouteImport.update({
     id: '/change-password',
     path: '/change-password',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedMemberRoute = AuthenticatedMemberRouteImport.update({
+  id: '/member',
+  path: '/member',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin-login': typeof AdminLoginRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/member-login': typeof MemberLoginRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/change-password': typeof AuthenticatedChangePasswordRoute
+  '/member': typeof AuthenticatedMemberRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin-login': typeof AdminLoginRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/member-login': typeof MemberLoginRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/change-password': typeof AuthenticatedChangePasswordRoute
+  '/member': typeof AuthenticatedMemberRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -68,7 +84,9 @@ export interface FileRoutesById {
   '/admin-login': typeof AdminLoginRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/member-login': typeof MemberLoginRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/change-password': typeof AuthenticatedChangePasswordRoute
+  '/_authenticated/member': typeof AuthenticatedMemberRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -77,14 +95,18 @@ export interface FileRouteTypes {
     | '/admin-login'
     | '/forgot-password'
     | '/member-login'
+    | '/admin'
     | '/change-password'
+    | '/member'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/admin-login'
     | '/forgot-password'
     | '/member-login'
+    | '/admin'
     | '/change-password'
+    | '/member'
   id:
     | '__root__'
     | '/'
@@ -92,7 +114,9 @@ export interface FileRouteTypes {
     | '/admin-login'
     | '/forgot-password'
     | '/member-login'
+    | '/_authenticated/admin'
     | '/_authenticated/change-password'
+    | '/_authenticated/member'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -140,6 +164,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MemberLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/change-password': {
       id: '/_authenticated/change-password'
       path: '/change-password'
@@ -147,15 +178,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedChangePasswordRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/member': {
+      id: '/_authenticated/member'
+      path: '/member'
+      fullPath: '/member'
+      preLoaderRoute: typeof AuthenticatedMemberRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedChangePasswordRoute: typeof AuthenticatedChangePasswordRoute
+  AuthenticatedMemberRoute: typeof AuthenticatedMemberRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedChangePasswordRoute: AuthenticatedChangePasswordRoute,
+  AuthenticatedMemberRoute: AuthenticatedMemberRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

@@ -48,7 +48,7 @@ function MoneyPage() {
       <Panel title="கடன் பதிவுகள்" sub="Money taken" className="mb-6">
         <DataTable empty={data.taken.length === 0} head={[<Th ta="குறியீடு" en="Code" />, <Th ta="உறுப்பினர்" en="Member" />, <Th ta="தேதி" en="Date" />, <Th ta="தொகை" en="Taken" />, <Th ta="கூடுதல்" en="Extra" />, <Th ta="மொத்தம்" en="Total" />, <Th ta="மீதம்" en="Remaining" />, <Th ta="நிலை" en="Status" />, ""]}>
           {data.taken.map((t) => {
-            const s = MT_STATUS[t.status ?? "active"];
+            const s = MT_STATUS[t.status ?? "active"] ?? MT_STATUS[Object.keys(MT_STATUS)[0]!]!;
             return (
               <tr key={t.id}>
                 <td className="font-mono text-xs">{t.transaction_code}</td>
@@ -96,7 +96,7 @@ function TakenForm({ members, done }: { members: { id: string; full_name: string
     e.preventDefault(); setBusy(true);
     const { data, error } = await supabase.rpc("record_money_taken", { _member_id: f.member, _date: f.date, _amount: Number(f.amount), _extra: Number(f.extra || 0), _notes: f.notes });
     setBusy(false);
-    if (error) return toast.error(errMsg(error));
+    if (error) { toast.error(errMsg(error)); return; }
     toast.success(`பதிவு ${data} (Saved)`); done();
   }
   const total = Number(f.amount || 0) + Number(f.extra || 0);
@@ -129,7 +129,7 @@ function ReturnForm({ t, done }: { t: Taken; done: () => void }) {
     e.preventDefault(); setBusy(true);
     const { data, error } = await supabase.rpc("record_money_returned", { _money_taken_id: t.id!, _amount: Number(amount), _date: date, _notes: notes });
     setBusy(false);
-    if (error) return toast.error(errMsg(error));
+    if (error) { toast.error(errMsg(error)); return; }
     toast.success(`பதிவு ${data} (Saved)`); done();
   }
   return (

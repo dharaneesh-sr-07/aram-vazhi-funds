@@ -33,7 +33,7 @@ function SettingsPage() {
     e.preventDefault(); setBusy(true);
     const { error } = await supabase.rpc("update_settings", { _monthly: Number(m), _yearly: Number(y) });
     setBusy(false);
-    if (error) return toast.error(errMsg(error));
+    if (error) { toast.error(errMsg(error)); return; }
     toast.success("சேமிக்கப்பட்டது (Saved)");
     qc.invalidateQueries({ queryKey: ["settings"] });
   }

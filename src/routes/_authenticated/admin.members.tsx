@@ -45,7 +45,7 @@ function MembersPage() {
     if (!confirm(next === "inactive" ? `${row.full_name} — முடக்கவா? (Deactivate?)` : `${row.full_name} — மீண்டும் செயல்படுத்தவா? (Reactivate?)`)) return;
     try {
       const r = await setStatus({ data: { memberId: row.id, status: next } });
-      if (!r.ok) return toast.error(r.error);
+      if (!r.ok) { toast.error(r.error); return; }
       toast.success("மாற்றப்பட்டது (Updated)");
       refresh();
     } catch (e) { toast.error(errMsg(e)); }
@@ -92,7 +92,7 @@ function NewForm({ done }: { done: () => void }) {
     e.preventDefault(); setBusy(true);
     try {
       const r = await fn({ data: f });
-      if (!r.ok) return toast.error(r.error);
+      if (!r.ok) { toast.error(r.error); return; }
       toast.success(`உருவாக்கப்பட்டது: ${r.memberCode} (Created)`);
       done();
     } catch (e) { toast.error(errMsg(e)); } finally { setBusy(false); }
@@ -122,7 +122,7 @@ function EditForm({ row, done }: { row: Row; done: () => void }) {
     e.preventDefault(); setBusy(true);
     try {
       const r = await fn({ data: { memberId: row.id, fullName, role } });
-      if (!r.ok) return toast.error(r.error);
+      if (!r.ok) { toast.error(r.error); return; }
       toast.success("சேமிக்கப்பட்டது (Saved)"); done();
     } catch (e) { toast.error(errMsg(e)); } finally { setBusy(false); }
   }
@@ -148,7 +148,7 @@ function ResetForm({ row, done }: { row: Row; done: () => void }) {
     e.preventDefault(); setBusy(true);
     try {
       const r = await fn({ data: { memberId: row.id, tempPassword: pw } });
-      if (!r.ok) return toast.error(r.error);
+      if (!r.ok) { toast.error(r.error); return; }
       toast.success("கடவுச்சொல் மாற்றப்பட்டது (Password reset)"); done();
     } catch (e) { toast.error(errMsg(e)); } finally { setBusy(false); }
   }

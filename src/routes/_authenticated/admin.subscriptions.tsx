@@ -40,8 +40,8 @@ function SubsPage() {
   const refresh = () => qc.invalidateQueries({ queryKey: ["obligations"] });
 
   async function generate() {
-    const { data: n, error } = await supabase.rpc("generate_obligations", { _type: type, _year: year, _month: type === "monthly" ? month : undefined });
-    if (error) return toast.error(errMsg(error));
+    const { data: n, error } = await supabase.rpc("generate_obligations", { _type: type, _year: year, ...(type === "monthly" ? { _month: month } : {}) });
+    if (error) { toast.error(errMsg(error)); return; }
     toast.success(`${n} புதிய பதிவுகள் (${n} created)`);
     refresh();
   }
@@ -78,7 +78,7 @@ function SubsPage() {
         </select>}>
         <DataTable empty={rows.length === 0} head={[<Th ta="உறுப்பினர்" en="Member" />, <Th ta="வகை" en="Type" />, <Th ta="காலம்" en="Period" />, <Th ta="தொகை" en="Due" />, <Th ta="செலுத்தியது" en="Paid" />, <Th ta="மீதம்" en="Remaining" />, <Th ta="நிலை" en="Status" />, ""]}>
           {rows.map((r) => {
-            const s = SUB_STATUS[r.status ?? "pending"];
+            const s = SUB_STATUS[r.status ?? "pending"] ?? SUB_STATUS[Object.keys(SUB_STATUS)[0]!]!;
             return (
               <tr key={r.id}>
                 <td><span className="font-medium">{r.full_name}</span> <span className="font-mono text-xs text-muted-foreground">{r.member_code}</span></td>
@@ -110,7 +110,7 @@ function PayForm({ ob, done }: { ob: Ob; done: () => void }) {
     e.preventDefault(); setBusy(true);
     const { data, error } = await supabase.rpc("record_subscription_payment", { _obligation_id: ob.id!, _amount: Number(amount), _date: date, _notes: notes });
     setBusy(false);
-    if (error) return toast.error(errMsg(error));
+    if (error) { toast.error(errMsg(error)); return; }
     toast.success(`ரசீது ${data} (Receipt saved)`); done();
   }
   return (

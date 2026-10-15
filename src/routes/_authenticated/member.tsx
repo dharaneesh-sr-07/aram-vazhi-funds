@@ -46,7 +46,7 @@ function MemberHome() {
       <Panel title="என் சந்தா" sub="My subscriptions" className="mb-6">
         <DataTable empty={ob.length === 0} head={[<Th ta="வகை" en="Type" />, <Th ta="காலம்" en="Period" />, <Th ta="தொகை" en="Due" />, <Th ta="செலுத்தியது" en="Paid" />, <Th ta="மீதம்" en="Remaining" />, <Th ta="நிலை" en="Status" />]}>
           {ob.map((r) => {
-            const s = SUB_STATUS[r.status ?? "pending"];
+            const s = SUB_STATUS[r.status ?? "pending"] ?? SUB_STATUS[Object.keys(SUB_STATUS)[0]!]!;
             return (
               <tr key={r.id}>
                 <td>{r.payment_type === "monthly" ? "மாதம் (Monthly)" : "ஆண்டு (Yearly)"}</td>
@@ -63,7 +63,7 @@ function MemberHome() {
       <Panel title="என் கடன்கள்" sub="Money I have taken" className="mb-6">
         <DataTable empty={mt.length === 0} head={[<Th ta="குறியீடு" en="Code" />, <Th ta="தேதி" en="Date" />, <Th ta="தொகை" en="Taken" />, <Th ta="கூடுதல்" en="Extra" />, <Th ta="மொத்தம்" en="Total" />, <Th ta="மீதம்" en="Remaining" />, <Th ta="நிலை" en="Status" />]}>
           {mt.map((t) => {
-            const s = MT_STATUS[t.status ?? "active"];
+            const s = MT_STATUS[t.status ?? "active"] ?? MT_STATUS[Object.keys(MT_STATUS)[0]!]!;
             return (
               <tr key={t.id}>
                 <td className="font-mono text-xs">{t.transaction_code}</td>

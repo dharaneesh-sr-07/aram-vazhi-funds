@@ -23,7 +23,6 @@ import { Route as AuthenticatedAdminMembersRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminMoneyRouteImport } from './routes/_authenticated/admin.money'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin.settings'
 import { Route as AuthenticatedAdminSubscriptionsRouteImport } from './routes/_authenticated/admin.subscriptions'
-import { Route as ApiPublicSetupOnceRouteImport } from './routes/api/public/setup-once'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -98,11 +97,6 @@ const AuthenticatedAdminSubscriptionsRoute =
     path: '/subscriptions',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
-const ApiPublicSetupOnceRoute = ApiPublicSetupOnceRouteImport.update({
-  id: '/api/public/setup-once',
-  path: '/api/public/setup-once',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -117,7 +111,6 @@ export interface FileRoutesByFullPath {
   '/admin/money': typeof AuthenticatedAdminMoneyRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/subscriptions': typeof AuthenticatedAdminSubscriptionsRoute
-  '/api/public/setup-once': typeof ApiPublicSetupOnceRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesByTo {
@@ -132,7 +125,6 @@ export interface FileRoutesByTo {
   '/admin/money': typeof AuthenticatedAdminMoneyRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/subscriptions': typeof AuthenticatedAdminSubscriptionsRoute
-  '/api/public/setup-once': typeof ApiPublicSetupOnceRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesById {
@@ -150,7 +142,6 @@ export interface FileRoutesById {
   '/_authenticated/admin/money': typeof AuthenticatedAdminMoneyRoute
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/subscriptions': typeof AuthenticatedAdminSubscriptionsRoute
-  '/api/public/setup-once': typeof ApiPublicSetupOnceRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRouteTypes {
@@ -168,7 +159,6 @@ export interface FileRouteTypes {
     | '/admin/money'
     | '/admin/settings'
     | '/admin/subscriptions'
-    | '/api/public/setup-once'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -183,7 +173,6 @@ export interface FileRouteTypes {
     | '/admin/money'
     | '/admin/settings'
     | '/admin/subscriptions'
-    | '/api/public/setup-once'
     | '/admin'
   id:
     | '__root__'
@@ -200,7 +189,6 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/money'
     | '/_authenticated/admin/settings'
     | '/_authenticated/admin/subscriptions'
-    | '/api/public/setup-once'
     | '/_authenticated/admin/'
   fileRoutesById: FileRoutesById
 }
@@ -210,7 +198,6 @@ export interface RootRouteChildren {
   AdminLoginRoute: typeof AdminLoginRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   MemberLoginRoute: typeof MemberLoginRoute
-  ApiPublicSetupOnceRoute: typeof ApiPublicSetupOnceRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -313,13 +300,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminSubscriptionsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
-    '/api/public/setup-once': {
-      id: '/api/public/setup-once'
-      path: '/api/public/setup-once'
-      fullPath: '/api/public/setup-once'
-      preLoaderRoute: typeof ApiPublicSetupOnceRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
@@ -365,7 +345,6 @@ const rootRouteChildren: RootRouteChildren = {
   AdminLoginRoute: AdminLoginRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   MemberLoginRoute: MemberLoginRoute,
-  ApiPublicSetupOnceRoute: ApiPublicSetupOnceRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

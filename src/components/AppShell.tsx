@@ -2,7 +2,7 @@ import { useState, type ReactNode } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { LogOut, Menu, X, type LucideIcon } from "lucide-react";
-import logo from "@/assets/avk-logo.png";
+import logoAsset from "@/assets/avk-logo.png.asset.json";
 import { signOut, type Me } from "@/lib/session";
 import { cn } from "@/lib/utils";
 
@@ -23,7 +23,7 @@ export function AppShell({ me, nav, title, children }: { me: Me; nav: NavItem[];
   const sidebar = (
     <div className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
       <div className="flex items-center gap-3 px-5 py-5">
-        <img src={logo} alt="" width={816} height={816} className="size-10 rounded-full bg-card p-0.5" />
+        <img src={logoAsset.url} alt="" width={1302} height={1302} className="size-10 rounded-full bg-card p-0.5" />
         <div className="leading-tight">
           <p className="font-display font-bold">அறம் வழிக் குழு</p>
           <p className="text-xs opacity-70">{title}</p>
@@ -66,7 +66,7 @@ export function AppShell({ me, nav, title, children }: { me: Me; nav: NavItem[];
       <aside className="sticky top-0 hidden h-screen lg:block">{sidebar}</aside>
       <header className="sticky top-0 z-30 flex items-center justify-between border-b bg-card/95 px-4 py-3 backdrop-blur lg:hidden">
         <div className="flex items-center gap-2">
-          <img src={logo} alt="" width={816} height={816} className="size-8" />
+          <img src={logoAsset.url} alt="" width={1302} height={1302} className="size-8" />
           <span className="font-display font-bold text-primary">அறம் வழிக் குழு</span>
         </div>
         <button onClick={() => setOpen(true)} aria-label="பட்டியல் (Menu)" className="rounded-md p-2 hover:bg-muted">

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { Eye, EyeOff, Loader2, ArrowLeft, AlertCircle } from "lucide-react";
-import logo from "@/assets/avk-logo.png";
+import logoAsset from "@/assets/avk-logo.png.asset.json";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { loginWithUsername } from "@/lib/auth.functions";
@@ -57,7 +57,7 @@ export function LoginForm({ portal }: { portal: "admin" | "member" }) {
         </Link>
         <div className="animate-rise rounded-2xl border bg-card p-7 shadow-lift">
           <div className="flex items-center gap-3">
-            <img src={logo} alt="" width={816} height={816} className="size-12" />
+            <img src={logoAsset.url} alt="" width={1302} height={1302} className="size-12" />
             <div>
               <h1 className="text-xl font-bold text-primary">{isAdmin ? "நிர்வாகி உள்நுழைவு" : "உறுப்பினர் உள்நுழைவு"}</h1>
               <p className="text-xs text-muted-foreground">{isAdmin ? "Admin Login" : "Member Login"} · அறம் வழிக் குழு</p>

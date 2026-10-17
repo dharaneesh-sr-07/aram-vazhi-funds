@@ -15,6 +15,13 @@
       "when": 1792158765185,
       "tag": "0001_restrict_app_settings_read",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792223761111,
+      "tag": "0002_yearly_totals_and_edit_obligation",
+      "breakpoints": true
     }
   ]
 }

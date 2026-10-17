@@ -22,6 +22,13 @@
       "when": 1792223761111,
       "tag": "0002_yearly_totals_and_edit_obligation",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1792224982176,
+      "tag": "0003_joined_on_and_edit_period",
+      "breakpoints": true
     }
   ]
 }

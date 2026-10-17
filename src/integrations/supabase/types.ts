@@ -313,6 +313,36 @@ export type Database = {
         }
         Relationships: []
       }
+      yearly_totals: {
+        Row: {
+          created_at: string
+          id: string
+          notes: string | null
+          total_amount: number
+          updated_at: string
+          updated_by: string | null
+          year: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          total_amount: number
+          updated_at?: string
+          updated_by?: string | null
+          year: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          total_amount?: number
+          updated_at?: string
+          updated_by?: string | null
+          year?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       money_taken_status: {
@@ -418,6 +448,10 @@ export type Database = {
           _obligation_id: string
         }
         Returns: string
+      }
+      update_obligation_amount: {
+        Args: { _amount: number; _obligation_id: string }
+        Returns: undefined
       }
       update_settings: {
         Args: { _monthly: number; _yearly: number }

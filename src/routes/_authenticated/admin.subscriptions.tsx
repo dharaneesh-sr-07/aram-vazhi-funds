@@ -37,6 +37,7 @@ function SubsPage() {
   const [month, setMonth] = useState(now.getMonth() + 1);
   const [filter, setFilter] = useState("all");
   const [pay, setPay] = useState<Ob | null>(null);
+  const [edit, setEdit] = useState<Ob | null>(null);
   const refresh = () => qc.invalidateQueries({ queryKey: ["obligations"] });
 
   async function generate() {
@@ -88,7 +89,10 @@ function SubsPage() {
                 <td className="tabular-nums">{inr(r.amount_paid)}</td>
                 <td className="tabular-nums">{inr(r.remaining)}</td>
                 <td><StatusPill tone={s.tone}>{s.ta}</StatusPill></td>
-                <td className="text-right">{Number(r.remaining) > 0 && <Button size="sm" variant="outline" onClick={() => setPay(r)}>பணம் பெறு (Pay)</Button>}</td>
+                <td className="space-x-2 whitespace-nowrap text-right">
+                  <Button size="sm" variant="ghost" onClick={() => setEdit(r)}>திருத்து (Edit)</Button>
+                  {Number(r.remaining) > 0 && <Button size="sm" variant="outline" onClick={() => setPay(r)}>பணம் பெறு (Pay)</Button>}
+                </td>
               </tr>
             );
           })}
@@ -97,7 +101,30 @@ function SubsPage() {
       <Dialog open={!!pay} onOpenChange={(o) => !o && setPay(null)}>
         <DialogContent>{pay && <PayForm ob={pay} done={() => { setPay(null); refresh(); }} />}</DialogContent>
       </Dialog>
+      <Dialog open={!!edit} onOpenChange={(o) => !o && setEdit(null)}>
+        <DialogContent>{edit && <EditForm ob={edit} done={() => { setEdit(null); refresh(); }} />}</DialogContent>
+      </Dialog>
     </>
+  );
+}
+
+function EditForm({ ob, done }: { ob: Ob; done: () => void }) {
+  const [amount, setAmount] = useState(String(ob.amount_due ?? ""));
+  const [busy, setBusy] = useState(false);
+  async function submit(e: React.FormEvent) {
+    e.preventDefault(); setBusy(true);
+    const { error } = await supabase.rpc("update_obligation_amount", { _obligation_id: ob.id!, _amount: Number(amount) });
+    setBusy(false);
+    if (error) { toast.error(errMsg(error)); return; }
+    toast.success("சேமிக்கப்பட்டது (Saved)"); done();
+  }
+  return (
+    <form onSubmit={submit} className="space-y-4">
+      <DialogHeader><DialogTitle>சந்தா திருத்து — {ob.full_name}</DialogTitle></DialogHeader>
+      <p className="text-sm text-muted-foreground">செலுத்தியது (Paid): {inr(ob.amount_paid)}</p>
+      <Field label="செலுத்த வேண்டிய தொகை (Amount Due ₹)"><Input type="number" step="0.01" min={Math.max(0.01, Number(ob.amount_paid ?? 0))} required value={amount} onChange={(e) => setAmount(e.target.value)} /></Field>
+      <Button type="submit" disabled={busy} className="w-full">சேமி (Save)</Button>
+    </form>
   );
 }
 

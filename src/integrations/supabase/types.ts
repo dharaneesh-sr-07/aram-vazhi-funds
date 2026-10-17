@@ -74,6 +74,7 @@ export type Database = {
           created_at: string
           full_name: string
           id: string
+          joined_on: string | null
           member_code: string
           must_change_password: boolean
           status: Database["public"]["Enums"]["member_status"]
@@ -85,6 +86,7 @@ export type Database = {
           created_at?: string
           full_name: string
           id?: string
+          joined_on?: string | null
           member_code: string
           must_change_password?: boolean
           status?: Database["public"]["Enums"]["member_status"]
@@ -96,6 +98,7 @@ export type Database = {
           created_at?: string
           full_name?: string
           id?: string
+          joined_on?: string | null
           member_code?: string
           must_change_password?: boolean
           status?: Database["public"]["Enums"]["member_status"]
@@ -451,6 +454,10 @@ export type Database = {
       }
       update_obligation_amount: {
         Args: { _amount: number; _obligation_id: string }
+        Returns: undefined
+      }
+      update_obligation_period: {
+        Args: { _month?: number; _obligation_id: string; _year: number }
         Returns: undefined
       }
       update_settings: {

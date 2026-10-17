@@ -23,6 +23,7 @@ import { Route as AuthenticatedAdminMembersRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminMoneyRouteImport } from './routes/_authenticated/admin.money'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin.settings'
 import { Route as AuthenticatedAdminSubscriptionsRouteImport } from './routes/_authenticated/admin.subscriptions'
+import { Route as AuthenticatedAdminYearlyTotalsRouteImport } from './routes/_authenticated/admin.yearly-totals'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -97,6 +98,12 @@ const AuthenticatedAdminSubscriptionsRoute =
     path: '/subscriptions',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminYearlyTotalsRoute =
+  AuthenticatedAdminYearlyTotalsRouteImport.update({
+    id: '/yearly-totals',
+    path: '/yearly-totals',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -111,6 +118,7 @@ export interface FileRoutesByFullPath {
   '/admin/money': typeof AuthenticatedAdminMoneyRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/subscriptions': typeof AuthenticatedAdminSubscriptionsRoute
+  '/admin/yearly-totals': typeof AuthenticatedAdminYearlyTotalsRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesByTo {
@@ -125,6 +133,7 @@ export interface FileRoutesByTo {
   '/admin/money': typeof AuthenticatedAdminMoneyRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/subscriptions': typeof AuthenticatedAdminSubscriptionsRoute
+  '/admin/yearly-totals': typeof AuthenticatedAdminYearlyTotalsRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesById {
@@ -142,6 +151,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/money': typeof AuthenticatedAdminMoneyRoute
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/subscriptions': typeof AuthenticatedAdminSubscriptionsRoute
+  '/_authenticated/admin/yearly-totals': typeof AuthenticatedAdminYearlyTotalsRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRouteTypes {
@@ -159,6 +169,7 @@ export interface FileRouteTypes {
     | '/admin/money'
     | '/admin/settings'
     | '/admin/subscriptions'
+    | '/admin/yearly-totals'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -173,6 +184,7 @@ export interface FileRouteTypes {
     | '/admin/money'
     | '/admin/settings'
     | '/admin/subscriptions'
+    | '/admin/yearly-totals'
     | '/admin'
   id:
     | '__root__'
@@ -189,6 +201,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/money'
     | '/_authenticated/admin/settings'
     | '/_authenticated/admin/subscriptions'
+    | '/_authenticated/admin/yearly-totals'
     | '/_authenticated/admin/'
   fileRoutesById: FileRoutesById
 }
@@ -300,6 +313,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminSubscriptionsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/yearly-totals': {
+      id: '/_authenticated/admin/yearly-totals'
+      path: '/yearly-totals'
+      fullPath: '/admin/yearly-totals'
+      preLoaderRoute: typeof AuthenticatedAdminYearlyTotalsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
   }
 }
 
@@ -309,6 +329,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminMoneyRoute: typeof AuthenticatedAdminMoneyRoute
   AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
   AuthenticatedAdminSubscriptionsRoute: typeof AuthenticatedAdminSubscriptionsRoute
+  AuthenticatedAdminYearlyTotalsRoute: typeof AuthenticatedAdminYearlyTotalsRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
@@ -318,6 +339,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminMoneyRoute: AuthenticatedAdminMoneyRoute,
   AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
   AuthenticatedAdminSubscriptionsRoute: AuthenticatedAdminSubscriptionsRoute,
+  AuthenticatedAdminYearlyTotalsRoute: AuthenticatedAdminYearlyTotalsRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
 

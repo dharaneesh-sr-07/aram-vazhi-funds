@@ -110,18 +110,35 @@ function SubsPage() {
 
 function EditForm({ ob, done }: { ob: Ob; done: () => void }) {
   const [amount, setAmount] = useState(String(ob.amount_due ?? ""));
+  const [year, setYear] = useState(Number(ob.period_year));
+  const [month, setMonth] = useState(Number(ob.period_month ?? 1));
   const [busy, setBusy] = useState(false);
+  const monthly = ob.payment_type === "monthly";
   async function submit(e: React.FormEvent) {
     e.preventDefault(); setBusy(true);
-    const { error } = await supabase.rpc("update_obligation_amount", { _obligation_id: ob.id!, _amount: Number(amount) });
+    if (year !== ob.period_year || (monthly && month !== ob.period_month)) {
+      const { error } = await supabase.rpc("update_obligation_period", { _obligation_id: ob.id!, _year: year, ...(monthly ? { _month: month } : {}) });
+      if (error) { setBusy(false); toast.error(errMsg(error)); return; }
+    }
+    if (Number(amount) !== Number(ob.amount_due)) {
+      const { error } = await supabase.rpc("update_obligation_amount", { _obligation_id: ob.id!, _amount: Number(amount) });
+      if (error) { setBusy(false); toast.error(errMsg(error)); return; }
+    }
     setBusy(false);
-    if (error) { toast.error(errMsg(error)); return; }
     toast.success("சேமிக்கப்பட்டது (Saved)"); done();
   }
   return (
     <form onSubmit={submit} className="space-y-4">
       <DialogHeader><DialogTitle>சந்தா திருத்து — {ob.full_name}</DialogTitle></DialogHeader>
       <p className="text-sm text-muted-foreground">செலுத்தியது (Paid): {inr(ob.amount_paid)}</p>
+      <Field label="ஆண்டு (Year)"><Input type="number" min={2000} max={2100} required value={year} onChange={(e) => setYear(Number(e.target.value))} /></Field>
+      {monthly && (
+        <Field label="மாதம் (Month)">
+          <select className={selectCls} value={month} onChange={(e) => setMonth(Number(e.target.value))}>
+            {TA_MONTHS.map((t, i) => <option key={i} value={i + 1}>{t} ({EN_MONTHS[i]})</option>)}
+          </select>
+        </Field>
+      )}
       <Field label="செலுத்த வேண்டிய தொகை (Amount Due ₹)"><Input type="number" step="0.01" min={Math.max(0.01, Number(ob.amount_paid ?? 0))} required value={amount} onChange={(e) => setAmount(e.target.value)} /></Field>
       <Button type="submit" disabled={busy} className="w-full">சேமி (Save)</Button>
     </form>

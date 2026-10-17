@@ -46,20 +46,20 @@ export const createMember = createServerFn({ method: "POST" })
 
 export const updateMember = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d) => z.object({ memberId: z.string().uuid(), fullName: z.string().trim().min(2).max(80), role: roleEnum }).parse(d))
+  .inputValidator((d) => z.object({ memberId: z.string().uuid(), fullName: z.string().trim().min(2).max(80), role: roleEnum, joinedOn: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().optional() }).parse(d))
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase as never);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: m } = await supabaseAdmin.from("members").select("id,auth_user_id,full_name").eq("id", data.memberId).single();
+    const { data: m } = await supabaseAdmin.from("members").select("id,auth_user_id,full_name,joined_on").eq("id", data.memberId).single();
     if (!m?.auth_user_id) return { ok: false as const, error: "Member not found" };
     if (m.auth_user_id === context.userId && data.role !== "admin")
       return { ok: false as const, error: "உங்கள் சொந்த நிர்வாகி உரிமையை நீக்க முடியாது (Cannot remove your own admin role)" };
-    await supabaseAdmin.from("members").update({ full_name: data.fullName, updated_at: new Date().toISOString() }).eq("id", m.id);
+    await supabaseAdmin.from("members").update({ full_name: data.fullName, ...(data.joinedOn !== undefined ? { joined_on: data.joinedOn } : {}), updated_at: new Date().toISOString() }).eq("id", m.id);
     await supabaseAdmin.from("user_roles").delete().eq("user_id", m.auth_user_id);
     await supabaseAdmin.from("user_roles").insert({ user_id: m.auth_user_id, role: data.role });
     await supabaseAdmin.from("audit_logs").insert({
       actor_user_id: context.userId, actor_name: await actorName(supabaseAdmin, context.userId),
-      action: "update_member", entity: "members", entity_id: m.id, details: { from: m.full_name, full_name: data.fullName, role: data.role },
+      action: "update_member", entity: "members", entity_id: m.id, details: { from: m.full_name, full_name: data.fullName, role: data.role, from_joined_on: m.joined_on, joined_on: data.joinedOn ?? m.joined_on },
     });
     return { ok: true as const };
   });

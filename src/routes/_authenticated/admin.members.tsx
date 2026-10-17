@@ -63,7 +63,7 @@ function MembersPage() {
               <td>{r.username}</td>
               <td>{r.role === "admin" ? "நிர்வாகி (Admin)" : "உறுப்பினர் (Member)"}</td>
               <td><StatusPill tone={r.status === "active" ? "success" : "danger"}>{r.status === "active" ? "செயலில் (Active)" : "முடக்கம் (Inactive)"}</StatusPill></td>
-              <td>{fmtDate(r.created_at)}</td>
+              <td>{fmtDate(r.joined_on ?? r.created_at)}</td>
               <td className="whitespace-nowrap text-right">
                 <Button size="sm" variant="ghost" onClick={() => setDlg({ kind: "edit", row: r })}>திருத்து</Button>
                 <Button size="sm" variant="ghost" onClick={() => setDlg({ kind: "reset", row: r })}>கடவுச்சொல்</Button>
@@ -118,10 +118,11 @@ function EditForm({ row, done }: { row: Row; done: () => void }) {
   const [busy, setBusy] = useState(false);
   const [fullName, setName] = useState(row.full_name);
   const [role, setRole] = useState(row.role);
+  const [joinedOn, setJoined] = useState(row.joined_on ?? "");
   async function submit(e: React.FormEvent) {
     e.preventDefault(); setBusy(true);
     try {
-      const r = await fn({ data: { memberId: row.id, fullName, role } });
+      const r = await fn({ data: { memberId: row.id, fullName, role, joinedOn: joinedOn || null } });
       if (!r.ok) { toast.error(r.error); return; }
       toast.success("சேமிக்கப்பட்டது (Saved)"); done();
     } catch (e) { toast.error(errMsg(e)); } finally { setBusy(false); }
@@ -130,6 +131,7 @@ function EditForm({ row, done }: { row: Row; done: () => void }) {
     <form onSubmit={submit} className="space-y-4">
       <DialogHeader><DialogTitle>திருத்து — {row.member_code}</DialogTitle></DialogHeader>
       <Field label="முழுப் பெயர் (Full name)"><Input required value={fullName} onChange={(e) => setName(e.target.value)} /></Field>
+      <Field label="சேர்ந்த தேதி (Joining date)"><Input type="date" value={joinedOn} onChange={(e) => setJoined(e.target.value)} /></Field>
       <Field label="பங்கு (Role)">
         <select className={selectCls} value={role} onChange={(e) => setRole(e.target.value as "admin" | "member")}>
           <option value="member">உறுப்பினர் (Member)</option><option value="admin">நிர்வாகி (Admin)</option>

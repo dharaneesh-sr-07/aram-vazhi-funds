@@ -37,8 +37,7 @@ function Home() {
           நம்பிக்கை • ஒற்றுமை • வெளிப்படைத்தன்மை
         </p>
         <p className="animate-rise mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground" style={{ animationDelay: "220ms" }}>
-          எங்கள் குழுவின் சந்தா, பணம் பெற்ற மற்றும் திரும்பச் செலுத்திய விவரங்கள் அனைத்தும் இனி காகிதப் புத்தகத்திற்கு பதிலாக
-          பாதுகாப்பாக இங்கே பதிவு செய்யப்படுகின்றன.
+          நம்பிக்கையே நம் பலம்! ஒற்றுமையே நம் அடையாளம்! குழுவின் அனைத்து நிதிப் பரிவர்த்தனைகளும் வெளிப்படையாகவும் பாதுகாப்பாகவும் பராமரிக்கப்படும்.
         </p>
 
         <div className="animate-rise mt-10 grid w-full max-w-xl gap-4 sm:grid-cols-2" style={{ animationDelay: "300ms" }}>

@@ -28,6 +28,9 @@ function Home() {
   return (
     <main className="min-h-screen bg-hero">
       <div className="mx-auto flex max-w-5xl flex-col items-center px-5 pb-16 pt-14 text-center md:pt-20">
+        <p className="animate-rise mb-5 font-serif-tamil text-lg font-semibold tracking-wide text-gold md:text-2xl">
+          ஸ்ரீ பெரியகாண்டி அம்மன் துணை
+        </p>
         <img src={logoAsset.url} alt="அறம் வழிக் குழு சின்னம்" width={1302} height={1302} className="animate-rise size-32 md:size-40" />
         <h1 className="animate-rise mt-6 text-4xl font-bold text-primary md:text-6xl" style={{ animationDelay: "80ms" }}>
           அறம் வழிக் குழு

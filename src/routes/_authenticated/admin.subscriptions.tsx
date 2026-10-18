@@ -66,7 +66,7 @@ function SubsPage() {
     <>
       <PageHeader ta="சந்தா" en="Subscriptions" actions={
         <Button variant="outline" onClick={() => downloadTableImage("avk-subscriptions.png", "சந்தா விவரம் (Subscriptions)", ["எண் (ID)", "பெயர் (Name)", "வகை (Type)", "காலம் (Period)", "தொகை (Due)", "செலுத்தியது (Paid)", "மீதம் (Remaining)", "நிலை (Status)"], rows.map((r) => [r.member_code, r.full_name, r.payment_type === "monthly" ? "மாதம்" : "ஆண்டு", (r.payment_type === "monthly" ? monthLabel(r.period_month) + " " : "") + r.period_year, inr(r.amount_due), inr(r.amount_paid), inr(r.remaining), SUB_STATUS[r.status ?? ""]?.ta ?? r.status]))}>
-          <Download className="size-4" /> CSV
+          <Download className="size-4" /> படம் (Image)
         </Button>} />
       <Panel title="சந்தா உருவாக்கு" sub="Generate dues for all active members" className="mb-6">
         <div className="grid gap-3 sm:grid-cols-4 sm:items-end">

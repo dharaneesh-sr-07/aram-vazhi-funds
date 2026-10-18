@@ -43,7 +43,7 @@ function AdminHome() {
         <StatCard icon={AlertCircle} ta="நிலுவை சந்தா" en="Pending subscriptions" value={inr(data.pendingSubs)} tone="danger" />
         <StatCard icon={HandCoins} ta="திருப்ப வேண்டியது" en="Outstanding to return" value={inr(data.outstanding)} tone="gold" />
       </div>
-      <Panel title="சமீபத்திய கடன்கள்" sub="Recent money taken">
+      <Panel title="சமீபத்திய பணம் பெற்ற விவரம்" sub="Recent money taken">
         <DataTable empty={data.recent.length === 0} head={[<Th ta="குறியீடு" en="Code" />, <Th ta="உறுப்பினர்" en="Member" />, <Th ta="தேதி" en="Date" />, <Th ta="மொத்தம்" en="Total" />, <Th ta="மீதம்" en="Remaining" />, <Th ta="நிலை" en="Status" />]}>
           {data.recent.map((r) => {
             const s = MT_STATUS[r.status ?? "active"];

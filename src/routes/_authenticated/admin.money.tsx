@@ -27,7 +27,7 @@ const moneyQ = queryOptions({
 type Taken = Awaited<ReturnType<typeof moneyQ.queryFn & {}>>["taken"][number];
 
 export const Route = createFileRoute("/_authenticated/admin/money")({
-  head: () => ({ meta: [{ title: "கடன் / திருப்பம் — அறம் வழிக் குழு" }] }),
+  head: () => ({ meta: [{ title: "பணம் பெற்ற / திரும்பச் செலுத்திய விவரம் — அறம் வழிக் குழு" }] }),
   loader: ({ context }) => context.queryClient.ensureQueryData(moneyQ),
   component: MoneyPage,
 });
@@ -42,11 +42,11 @@ function MoneyPage() {
 
   return (
     <>
-      <PageHeader ta="கடன் / திருப்பம்" en="Money Taken & Returned" actions={<>
+      <PageHeader ta="பணம் பெற்ற / திரும்பச் செலுத்திய விவரம்" en="Money Taken & Returned" actions={<>
         <Button variant="outline" onClick={() => downloadTableImage("avk-money-taken.png", "பணம் பெற்ற விவரம் (Money Taken)", ["எண் (ID)", "உறுப்பினர் (Member)", "தேதி (Date)", "பெற்ற தொகை", "கூடுதல் தொகை", "மொத்தம் (Total)", "திரும்பியது", "மீதம் (Remaining)", "நிலை (Status)"], data.taken.map((t) => [t.transaction_code, t.full_name, fmtDate(t.taken_date), inr(t.amount_taken), inr(t.extra_amount), inr(t.total_to_return), inr(t.amount_returned), inr(t.remaining), MT_STATUS[t.status ?? ""]?.ta ?? t.status]))}><Download className="size-4" /> படம் (Image)</Button>
-        <Button onClick={() => setNewOpen(true)}><Plus className="size-4" /> புதிய கடன் (New)</Button>
+        <Button onClick={() => setNewOpen(true)}><Plus className="size-4" /> புதிய பதிவு (New)</Button>
       </>} />
-      <Panel title="கடன் பதிவுகள்" sub="Money taken" className="mb-6">
+      <Panel title="பணம் பெற்ற விவரம்" sub="Money taken" className="mb-6">
         <DataTable empty={data.taken.length === 0} head={[<Th ta="குறியீடு" en="Code" />, <Th ta="உறுப்பினர்" en="Member" />, <Th ta="தேதி" en="Date" />, <Th ta="தொகை" en="Taken" />, <Th ta="கூடுதல்" en="Extra" />, <Th ta="மொத்தம்" en="Total" />, <Th ta="மீதம்" en="Remaining" />, <Th ta="நிலை" en="Status" />, ""]}>
           {data.taken.map((t) => {
             const s = MT_STATUS[t.status ?? "active"] ?? MT_STATUS[Object.keys(MT_STATUS)[0]!]!;
@@ -67,7 +67,7 @@ function MoneyPage() {
         </DataTable>
       </Panel>
       <Panel title="திருப்பிய பதிவுகள்" sub="Money returned">
-        <DataTable empty={data.returned.length === 0} head={[<Th ta="குறியீடு" en="Code" />, <Th ta="கடன்" en="Loan" />, <Th ta="உறுப்பினர்" en="Member" />, <Th ta="தேதி" en="Date" />, <Th ta="தொகை" en="Amount" />, <Th ta="குறிப்பு" en="Notes" />]}>
+        <DataTable empty={data.returned.length === 0} head={[<Th ta="குறியீடு" en="Code" />, <Th ta="பெற்ற தொகை குறியீடு" en="Money taken ID" />, <Th ta="உறுப்பினர்" en="Member" />, <Th ta="தேதி" en="Date" />, <Th ta="தொகை" en="Amount" />, <Th ta="குறிப்பு" en="Notes" />]}>
           {data.returned.map((r) => (
             <tr key={r.id}>
               <td className="font-mono text-xs">{r.return_code}</td>
@@ -103,7 +103,7 @@ function TakenForm({ members, done }: { members: { id: string; full_name: string
   const total = Number(f.amount || 0) + Number(f.extra || 0);
   return (
     <form onSubmit={submit} className="space-y-4">
-      <DialogHeader><DialogTitle>புதிய கடன் (Money taken)</DialogTitle></DialogHeader>
+      <DialogHeader><DialogTitle>புதிய பணம் பெற்ற விவரம் (Money taken)</DialogTitle></DialogHeader>
       <Field label="உறுப்பினர் (Member)">
         <select className={selectCls} required value={f.member} onChange={(e) => setF({ ...f, member: e.target.value })}>
           {members.map((m) => <option key={m.id} value={m.id}>{m.member_code} — {m.full_name}</option>)}

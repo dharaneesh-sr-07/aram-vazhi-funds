@@ -9,7 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { selectCls } from "@/lib/nav";
-import { inr, fmtDate, MT_STATUS, today, errMsg, downloadCsv } from "@/lib/format";
+import { inr, fmtDate, MT_STATUS, today, errMsg } from "@/lib/format";
+import { downloadTableImage } from "@/lib/export-image";
 
 const moneyQ = queryOptions({
   queryKey: ["money"],
@@ -42,7 +43,7 @@ function MoneyPage() {
   return (
     <>
       <PageHeader ta="கடன் / திருப்பம்" en="Money Taken & Returned" actions={<>
-        <Button variant="outline" onClick={() => downloadCsv("avk-money-taken.csv", [["Code", "Member", "Date", "Taken", "Extra", "Total", "Returned", "Remaining", "Status"], ...data.taken.map((t) => [t.transaction_code, t.full_name, t.taken_date, t.amount_taken, t.extra_amount, t.total_to_return, t.amount_returned, t.remaining, t.status])])}><Download className="size-4" /> CSV</Button>
+        <Button variant="outline" onClick={() => downloadTableImage("avk-money-taken.png", "பணம் பெற்ற விவரம் (Money Taken)", ["எண் (ID)", "உறுப்பினர் (Member)", "தேதி (Date)", "பெற்ற தொகை", "கூடுதல் தொகை", "மொத்தம் (Total)", "திரும்பியது", "மீதம் (Remaining)", "நிலை (Status)"], data.taken.map((t) => [t.transaction_code, t.full_name, fmtDate(t.taken_date), inr(t.amount_taken), inr(t.extra_amount), inr(t.total_to_return), inr(t.amount_returned), inr(t.remaining), MT_STATUS[t.status ?? ""]?.ta ?? t.status]))}><Download className="size-4" /> படம் (Image)</Button>
         <Button onClick={() => setNewOpen(true)}><Plus className="size-4" /> புதிய கடன் (New)</Button>
       </>} />
       <Panel title="கடன் பதிவுகள்" sub="Money taken" className="mb-6">

@@ -63,7 +63,7 @@ export function LoginForm({ portal }: { portal: "admin" | "member" }) {
               <p className="text-xs text-muted-foreground">{isAdmin ? "Admin Login" : "Member Login"} · அறம் வழிக் குழு</p>
             </div>
           </div>
-          <form onSubmit={onSubmit} className="mt-6 space-y-4">
+          <form method="post" onSubmit={onSubmit} className="mt-6 space-y-4">
             <label className="block space-y-1.5">
               <span className="text-sm font-medium">பயனர்பெயர் (Username)</span>
               <Input name="username" required autoComplete="username" autoCapitalize="none" className="h-11" />

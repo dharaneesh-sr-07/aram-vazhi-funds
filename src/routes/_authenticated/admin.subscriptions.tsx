@@ -22,9 +22,18 @@ const obQ = queryOptions({
 });
 type Ob = Awaited<ReturnType<typeof obQ.queryFn & {}>>[number];
 
+const membersQ = queryOptions({
+  queryKey: ["members-pick"],
+  queryFn: async () => {
+    const { data, error } = await supabase.from("members").select("id,full_name,member_code,status").order("member_code");
+    if (error) throw error;
+    return data ?? [];
+  },
+});
+
 export const Route = createFileRoute("/_authenticated/admin/subscriptions")({
   head: () => ({ meta: [{ title: "சந்தா — அறம் வழிக் குழு" }] }),
-  loader: ({ context }) => context.queryClient.ensureQueryData(obQ),
+  loader: ({ context }) => Promise.all([context.queryClient.ensureQueryData(obQ), context.queryClient.ensureQueryData(membersQ)]),
   component: SubsPage,
 });
 
@@ -39,9 +48,13 @@ function SubsPage() {
   const [pay, setPay] = useState<Ob | null>(null);
   const [edit, setEdit] = useState<Ob | null>(null);
   const refresh = () => qc.invalidateQueries({ queryKey: ["obligations"] });
+  const { data: members } = useSuspenseQuery(membersQ);
+  const [picked, setPicked] = useState<Set<string>>(() => new Set(members.filter((m) => m.status === "active").map((m) => m.id)));
+  const toggle = (id: string) => setPicked((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
 
   async function generate() {
-    const { data: n, error } = await supabase.rpc("generate_obligations", { _type: type, _year: year, ...(type === "monthly" ? { _month: month } : {}) });
+    if (picked.size === 0) { toast.error("உறுப்பினர்களைத் தேர்ந்தெடுக்கவும் (Select members)"); return; }
+    const { data: n, error } = await supabase.rpc("generate_obligations_for", { _type: type, _year: year, _member_ids: [...picked], ...(type === "monthly" ? { _month: month } : {}) });
     if (error) { toast.error(errMsg(error)); return; }
     toast.success(`${n} புதிய பதிவுகள் (${n} created)`);
     refresh();
@@ -70,6 +83,22 @@ function SubsPage() {
             </Field>
           )}
           <Button onClick={generate}>உருவாக்கு (Generate)</Button>
+        </div>
+        <div className="mt-4">
+          <div className="mb-2 flex flex-wrap items-center gap-2">
+            <span className="text-sm font-medium">உறுப்பினர்கள் (Members) — {picked.size}/{members.length}</span>
+            <Button size="sm" variant="ghost" onClick={() => setPicked(new Set(members.map((m) => m.id)))}>அனைத்தும் (All)</Button>
+            <Button size="sm" variant="ghost" onClick={() => setPicked(new Set())}>எதுவுமில்லை (None)</Button>
+          </div>
+          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
+            {members.map((m) => (
+              <label key={m.id} className="flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2 text-sm">
+                <input type="checkbox" className="accent-primary" checked={picked.has(m.id)} onChange={() => toggle(m.id)} />
+                <span className="truncate">{m.full_name}</span>
+                <span className="font-mono text-xs text-muted-foreground">{m.member_code}</span>
+              </label>
+            ))}
+          </div>
         </div>
       </Panel>
       <Panel title="சந்தா பட்டியல்" sub="Dues & payments" actions={

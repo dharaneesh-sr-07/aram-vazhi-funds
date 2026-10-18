@@ -411,6 +411,15 @@ export type Database = {
         }
         Returns: number
       }
+      generate_obligations_for: {
+        Args: {
+          _member_ids: string[]
+          _month?: number
+          _type: Database["public"]["Enums"]["payment_type"]
+          _year: number
+        }
+        Returns: number
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

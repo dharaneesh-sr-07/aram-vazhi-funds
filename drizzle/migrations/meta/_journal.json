@@ -29,6 +29,13 @@
       "when": 1792224982176,
       "tag": "0003_joined_on_and_edit_period",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792292449234,
+      "tag": "0004_generate_obligations_for_members",
+      "breakpoints": true
     }
   ]
 }

@@ -60,7 +60,7 @@ function MemberHome() {
           })}
         </DataTable>
       </Panel>
-      <Panel title="என் கடன்கள்" sub="Money I have taken" className="mb-6">
+      <Panel title="நான் பெற்ற பணம்" sub="Money I have taken" className="mb-6">
         <DataTable empty={mt.length === 0} head={[<Th ta="குறியீடு" en="Code" />, <Th ta="தேதி" en="Date" />, <Th ta="தொகை" en="Taken" />, <Th ta="கூடுதல்" en="Extra" />, <Th ta="மொத்தம்" en="Total" />, <Th ta="மீதம்" en="Remaining" />, <Th ta="நிலை" en="Status" />]}>
           {mt.map((t) => {
             const s = MT_STATUS[t.status ?? "active"] ?? MT_STATUS[Object.keys(MT_STATUS)[0]!]!;
@@ -79,7 +79,7 @@ function MemberHome() {
         </DataTable>
       </Panel>
       <Panel title="நான் திருப்பியவை" sub="My repayments">
-        <DataTable empty={mr.length === 0} head={[<Th ta="குறியீடு" en="Code" />, <Th ta="கடன்" en="Loan" />, <Th ta="தேதி" en="Date" />, <Th ta="தொகை" en="Amount" />]}>
+        <DataTable empty={mr.length === 0} head={[<Th ta="குறியீடு" en="Code" />, <Th ta="பெற்ற தொகை குறியீடு" en="Money taken ID" />, <Th ta="தேதி" en="Date" />, <Th ta="தொகை" en="Amount" />]}>
           {mr.map((r) => (
             <tr key={r.id}>
               <td className="font-mono text-xs">{r.return_code}</td>

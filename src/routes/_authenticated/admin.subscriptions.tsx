@@ -9,7 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { selectCls } from "@/lib/nav";
-import { inr, fmtDate, monthLabel, SUB_STATUS, today, errMsg, downloadCsv, TA_MONTHS, EN_MONTHS } from "@/lib/format";
+import { inr, fmtDate, monthLabel, SUB_STATUS, today, errMsg, TA_MONTHS, EN_MONTHS } from "@/lib/format";
+import { downloadTableImage } from "@/lib/export-image";
 
 const obQ = queryOptions({
   queryKey: ["obligations"],
@@ -64,7 +65,7 @@ function SubsPage() {
   return (
     <>
       <PageHeader ta="சந்தா" en="Subscriptions" actions={
-        <Button variant="outline" onClick={() => downloadCsv("avk-subscriptions.csv", [["Code", "Name", "Type", "Month", "Year", "Due", "Paid", "Remaining", "Status"], ...rows.map((r) => [r.member_code, r.full_name, r.payment_type, r.period_month, r.period_year, r.amount_due, r.amount_paid, r.remaining, r.status])])}>
+        <Button variant="outline" onClick={() => downloadTableImage("avk-subscriptions.png", "சந்தா விவரம் (Subscriptions)", ["எண் (ID)", "பெயர் (Name)", "வகை (Type)", "காலம் (Period)", "தொகை (Due)", "செலுத்தியது (Paid)", "மீதம் (Remaining)", "நிலை (Status)"], rows.map((r) => [r.member_code, r.full_name, r.payment_type === "monthly" ? "மாதம்" : "ஆண்டு", (r.payment_type === "monthly" ? monthLabel(r.period_month) + " " : "") + r.period_year, inr(r.amount_due), inr(r.amount_paid), inr(r.remaining), SUB_STATUS[r.status ?? ""]?.ta ?? r.status]))}>
           <Download className="size-4" /> CSV
         </Button>} />
       <Panel title="சந்தா உருவாக்கு" sub="Generate dues for all active members" className="mb-6">

@@ -14,10 +14,14 @@ const dashQ = queryOptions({
       supabase.from("money_taken_status").select("*").order("taken_date", { ascending: false }),
     ]);
     const sum = (a: { [k: string]: unknown }[] | null, k: string) => (a ?? []).reduce((s, r) => s + Number(r[k] ?? 0), 0);
+    const collected = sum(ob.data, "amount_paid");
+    const extra = sum(mt.data, "extra_amount");
     return {
       active: (m.data ?? []).filter((x) => x.status === "active").length,
       total: m.data?.length ?? 0,
-      collected: sum(ob.data, "amount_paid"),
+      collected,
+      extra,
+      grand: collected + extra,
       pendingSubs: sum(ob.data, "remaining"),
       outstanding: sum(mt.data, "remaining"),
       recent: (mt.data ?? []).slice(0, 8),
@@ -37,9 +41,11 @@ function AdminHome() {
   return (
     <>
       <PageHeader ta="நிர்வாகி முகப்பு" en={`Admin Dashboard · ${me.fullName}`} />
-      <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <StatCard icon={Users} ta="செயலில் உறுப்பினர்கள்" en={`Active members (of ${data.total})`} value={data.active} />
+        <StatCard icon={Wallet} ta="மொத்த தொகை" en="Total amount (subscriptions + extra)" value={inr(data.grand)} />
         <StatCard icon={Wallet} ta="வசூலான சந்தா" en="Subscriptions collected" value={inr(data.collected)} />
+        <StatCard icon={HandCoins} ta="கூடுதல் தொகை" en="Extra amount" value={inr(data.extra)} tone="gold" />
         <StatCard icon={AlertCircle} ta="நிலுவை சந்தா" en="Pending subscriptions" value={inr(data.pendingSubs)} tone="danger" />
         <StatCard icon={HandCoins} ta="திருப்ப வேண்டியது" en="Outstanding to return" value={inr(data.outstanding)} tone="gold" />
       </div>

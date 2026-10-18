@@ -39,7 +39,7 @@ export function LoginForm({ portal }: { portal: "admin" | "member" }) {
         setNotice("முதல் உள்நுழைவு: புதிய கடவுச்சொல் அமைக்கவும் (Password change required)");
         await navigate({ to: "/change-password" });
       } else {
-        await navigate({ to: res.role === "admin" ? "/admin" : "/member" });
+        await navigate({ to: portal === "admin" && res.role === "admin" ? "/admin" : "/member" });
       }
     } catch {
       setError(MESSAGES.error);

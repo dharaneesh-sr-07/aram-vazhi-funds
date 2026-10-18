@@ -38,8 +38,9 @@ function MemberHome() {
   return (
     <AppShell me={me} title="உறுப்பினர் (Member)" nav={[{ to: "/member", ta: "முகப்பு", en: "Home", icon: LayoutDashboard, exact: true }]}>
       <PageHeader ta={`வணக்கம், ${me.fullName}`} en={`Member Dashboard · ${me.memberCode}`} />
-      <div className="mb-6 grid gap-4 sm:grid-cols-3">
+      <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard icon={Wallet} ta="செலுத்திய சந்தா" en="Subscriptions paid" value={inr(sum(ob, "amount_paid"))} />
+        <StatCard icon={HandCoins} ta="கூடுதல் தொகை" en="Extra amount" value={inr(sum(mt, "extra_amount"))} tone="gold" />
         <StatCard icon={AlertCircle} ta="நிலுவை சந்தா" en="Pending subscriptions" value={inr(sum(ob, "remaining"))} tone="danger" />
         <StatCard icon={HandCoins} ta="திருப்ப வேண்டியது" en="Amount to return" value={inr(sum(mt, "remaining"))} tone="gold" />
       </div>

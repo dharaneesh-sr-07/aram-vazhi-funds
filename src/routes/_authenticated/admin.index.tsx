@@ -4,6 +4,7 @@ import { Users, Wallet, HandCoins, AlertCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHeader, StatCard, Panel, DataTable, Th, StatusPill } from "@/components/ui-kit";
 import { inr, fmtDate, MT_STATUS } from "@/lib/format";
+import { calculateFundBalance } from "@/lib/fund-balance";
 
 const dashQ = queryOptions({
   queryKey: ["admin-dash"],
@@ -13,15 +14,18 @@ const dashQ = queryOptions({
       supabase.from("obligation_status").select("amount_due,amount_paid,remaining"),
       supabase.from("money_taken_status").select("*").order("taken_date", { ascending: false }),
     ]);
+    if (m.error) throw m.error;
+    if (ob.error) throw ob.error;
+    if (mt.error) throw mt.error;
     const sum = (a: { [k: string]: unknown }[] | null, k: string) => (a ?? []).reduce((s, r) => s + Number(r[k] ?? 0), 0);
     const collected = sum(ob.data, "amount_paid");
-    const extra = sum(mt.data, "extra_amount");
+    const balance = calculateFundBalance(collected, mt.data ?? []);
     return {
       active: (m.data ?? []).filter((x) => x.status === "active").length,
       total: m.data?.length ?? 0,
       collected,
-      extra,
-      grand: collected + extra,
+      extra: balance.extra,
+      grand: balance.total,
       pendingSubs: sum(ob.data, "remaining"),
       outstanding: sum(mt.data, "remaining"),
       recent: (mt.data ?? []).slice(0, 8),
@@ -43,7 +47,7 @@ function AdminHome() {
       <PageHeader ta="நிர்வாகி முகப்பு" en={`Admin Dashboard · ${me.fullName}`} />
       <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <StatCard icon={Users} ta="செயலில் உறுப்பினர்கள்" en={`Active members (of ${data.total})`} value={data.active} />
-        <StatCard icon={Wallet} ta="மொத்த தொகை" en="Total amount (subscriptions + extra)" value={inr(data.grand)} />
+        <StatCard icon={Wallet} ta="மொத்த தொகை" en="Total amount (after money taken & returned)" value={inr(data.grand)} />
         <StatCard icon={Wallet} ta="வசூலான சந்தா" en="Subscriptions collected" value={inr(data.collected)} />
         <StatCard icon={HandCoins} ta="கூடுதல் தொகை" en="Extra amount" value={inr(data.extra)} tone="gold" />
         <StatCard icon={AlertCircle} ta="நிலுவை சந்தா" en="Pending subscriptions" value={inr(data.pendingSubs)} tone="danger" />

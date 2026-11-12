@@ -42,7 +42,11 @@ function MoneyPage() {
   const [newOpen, setNewOpen] = useState(false);
   const [imageOpen, setImageOpen] = useState(false);
   const [ret, setRet] = useState<Taken | null>(null);
-  const refresh = () => qc.invalidateQueries({ queryKey: ["money"] });
+  const refresh = () => Promise.all([
+    qc.invalidateQueries({ queryKey: ["money"] }),
+    qc.invalidateQueries({ queryKey: ["admin-dash"] }),
+    qc.invalidateQueries({ queryKey: ["my-records"] }),
+  ]);
   const codeOf = new Map(data.taken.map((t) => [t.id, t]));
 
   const exportRows = (filters: ImageFilters) => data.taken.filter((t) => matchesImageFilters({

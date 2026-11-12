@@ -10,3 +10,4 @@
 <!-- LOVABLE:END -->
 
 - Keep image-export filters in a shared browser-safe predicate and dialog; both financial pages must apply identical inclusive member/date/amount filtering without modifying stored records.
+- Calculate the dashboard fund balance in a tested browser-safe helper, and invalidate dashboard/member queries after money changes so navigation reflects saved transactions.

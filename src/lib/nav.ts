@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, Receipt, HandCoins, History, Settings, CalendarRange } from "lucide-react";
+import { LayoutDashboard, Users, Receipt, HandCoins, Settings, CalendarRange } from "lucide-react";
 import type { NavItem } from "@/components/AppShell";
 
 export const ADMIN_NAV: NavItem[] = [
@@ -7,7 +7,6 @@ export const ADMIN_NAV: NavItem[] = [
   { to: "/admin/subscriptions", ta: "சந்தா", en: "Subscriptions", icon: Receipt },
   { to: "/admin/money", ta: "பணம் பெற்ற / திரும்பிய விவரம்", en: "Money Taken & Returned", icon: HandCoins },
   { to: "/admin/yearly-totals", ta: "ஆண்டு மொத்த தொகை", en: "Yearly Total Amount", icon: CalendarRange },
-  { to: "/admin/audit", ta: "செயல் பதிவு", en: "Audit Log", icon: History },
   { to: "/admin/settings", ta: "அமைப்புகள்", en: "Settings", icon: Settings },
 ];
 

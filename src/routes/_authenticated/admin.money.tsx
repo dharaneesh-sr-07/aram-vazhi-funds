@@ -31,7 +31,7 @@ const moneyQ = queryOptions({
 type Taken = Awaited<ReturnType<typeof moneyQ.queryFn & {}>>["taken"][number];
 
 export const Route = createFileRoute("/_authenticated/admin/money")({
-  head: () => ({ meta: [{ title: "பணம் பெற்ற / திரும்பச் செலுத்திய விவரம் — அறம் வழிக் குழு" }] }),
+  head: () => ({ meta: [{"title": "பணம் பெற்ற / திரும்பச் செலுத்திய விவரம் — அறம் வழிக் குழு"}, {"name": "description", "content": "அறம் வழிக் குழுவின் பணம் பெற்ற மற்றும் திரும்பச் செலுத்திய பதிவுகள்."}, {"property": "og:title", "content": "பணம் பெற்ற / திரும்பச் செலுத்திய விவரம் — அறம் வழிக் குழு"}, {"property": "og:description", "content": "அறம் வழிக் குழுவின் பணம் பெற்ற மற்றும் திரும்பச் செலுத்திய பதிவுகள்."}, {"property": "og:type", "content": "website"}, {"name": "twitter:card", "content": "summary"}] }),
   loader: ({ context }) => context.queryClient.ensureQueryData(moneyQ),
   component: MoneyPage,
 });

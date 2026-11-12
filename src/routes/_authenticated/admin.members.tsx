@@ -28,7 +28,7 @@ const membersQ = queryOptions({
 type Row = Awaited<ReturnType<typeof membersQ.queryFn & {}>>[number];
 
 export const Route = createFileRoute("/_authenticated/admin/members")({
-  head: () => ({ meta: [{ title: "உறுப்பினர்கள் — அறம் வழிக் குழு" }] }),
+  head: () => ({ meta: [{"title": "உறுப்பினர்கள் — அறம் வழிக் குழு"}, {"name": "description", "content": "அறம் வழிக் குழுவின் உறுப்பினர் விவரங்கள்."}, {"property": "og:title", "content": "உறுப்பினர்கள் — அறம் வழிக் குழு"}, {"property": "og:description", "content": "அறம் வழிக் குழுவின் உறுப்பினர் விவரங்கள்."}, {"property": "og:type", "content": "website"}, {"name": "twitter:card", "content": "summary"}] }),
   loader: ({ context }) => context.queryClient.ensureQueryData(membersQ),
   component: MembersPage,
 });

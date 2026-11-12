@@ -19,7 +19,7 @@ const myQ = queryOptions({
 });
 
 export const Route = createFileRoute("/_authenticated/member")({
-  head: () => ({ meta: [{ title: "உறுப்பினர் முகப்பு — அறம் வழிக் குழு" }] }),
+  head: () => ({ meta: [{"title": "உறுப்பினர் முகப்பு — அறம் வழிக் குழு"}, {"name": "description", "content": "அறம் வழிக் குழு உறுப்பினரின் சொந்த சந்தா மற்றும் பணப் பதிவுகள்."}, {"property": "og:title", "content": "உறுப்பினர் முகப்பு — அறம் வழிக் குழு"}, {"property": "og:description", "content": "அறம் வழிக் குழு உறுப்பினரின் சொந்த சந்தா மற்றும் பணப் பதிவுகள்."}, {"property": "og:type", "content": "website"}, {"name": "twitter:card", "content": "summary"}] }),
   beforeLoad: ({ context }) => {
     if (context.me.mustChange) throw redirect({ to: "/change-password" });
   },

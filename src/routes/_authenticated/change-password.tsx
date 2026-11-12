@@ -9,7 +9,7 @@ import { changeOwnPassword } from "@/lib/auth.functions";
 import { signOut } from "@/lib/session";
 
 export const Route = createFileRoute("/_authenticated/change-password")({
-  head: () => ({ meta: [{ title: "கடவுச்சொல் மாற்றம் — அறம் வழிக் குழு" }] }),
+  head: () => ({ meta: [{"title": "கடவுச்சொல் மாற்றம் — அறம் வழிக் குழு"}, {"name": "description", "content": "அறம் வழிக் குழு கணக்கின் கடவுச்சொல் மாற்றம்."}, {"property": "og:title", "content": "கடவுச்சொல் மாற்றம் — அறம் வழிக் குழு"}, {"property": "og:description", "content": "அறம் வழிக் குழு கணக்கின் கடவுச்சொல் மாற்றம்."}, {"property": "og:type", "content": "website"}, {"name": "twitter:card", "content": "summary"}] }),
   component: ChangePassword,
 });
 

@@ -35,7 +35,7 @@ const membersQ = queryOptions({
 });
 
 export const Route = createFileRoute("/_authenticated/admin/subscriptions")({
-  head: () => ({ meta: [{ title: "சந்தா — அறம் வழிக் குழு" }] }),
+  head: () => ({ meta: [{"title": "சந்தா — அறம் வழிக் குழு"}, {"name": "description", "content": "அறம் வழிக் குழுவின் மாத மற்றும் புடவை சந்தா பதிவுகள்."}, {"property": "og:title", "content": "சந்தா — அறம் வழிக் குழு"}, {"property": "og:description", "content": "அறம் வழிக் குழுவின் மாத மற்றும் புடவை சந்தா பதிவுகள்."}, {"property": "og:type", "content": "website"}, {"name": "twitter:card", "content": "summary"}] }),
   loader: ({ context }) => Promise.all([context.queryClient.ensureQueryData(obQ), context.queryClient.ensureQueryData(membersQ)]),
   component: SubsPage,
 });

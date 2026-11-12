@@ -18,7 +18,7 @@ const settingsQ = queryOptions({
 });
 
 export const Route = createFileRoute("/_authenticated/admin/settings")({
-  head: () => ({ meta: [{ title: "அமைப்புகள் — அறம் வழிக் குழு" }] }),
+  head: () => ({ meta: [{"title": "அமைப்புகள் — அறம் வழிக் குழு"}, {"name": "description", "content": "அறம் வழிக் குழுவின் சந்தா தொகை அமைப்புகள்."}, {"property": "og:title", "content": "அமைப்புகள் — அறம் வழிக் குழு"}, {"property": "og:description", "content": "அறம் வழிக் குழுவின் சந்தா தொகை அமைப்புகள்."}, {"property": "og:type", "content": "website"}, {"name": "twitter:card", "content": "summary"}] }),
   loader: ({ context }) => context.queryClient.ensureQueryData(settingsQ),
   component: SettingsPage,
 });

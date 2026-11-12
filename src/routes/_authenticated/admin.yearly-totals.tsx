@@ -21,7 +21,7 @@ const ytQ = queryOptions({
 type Row = Awaited<ReturnType<typeof ytQ.queryFn & {}>>[number];
 
 export const Route = createFileRoute("/_authenticated/admin/yearly-totals")({
-  head: () => ({ meta: [{ title: "ஆண்டு மொத்தம் — அறம் வழிக் குழு" }] }),
+  head: () => ({ meta: [{"title": "ஆண்டு மொத்தம் — அறம் வழிக் குழு"}, {"name": "description", "content": "அறம் வழிக் குழுவின் ஆண்டு வாரியான மொத்த தொகைகள்."}, {"property": "og:title", "content": "ஆண்டு மொத்தம் — அறம் வழிக் குழு"}, {"property": "og:description", "content": "அறம் வழிக் குழுவின் ஆண்டு வாரியான மொத்த தொகைகள்."}, {"property": "og:type", "content": "website"}, {"name": "twitter:card", "content": "summary"}] }),
   loader: ({ context }) => context.queryClient.ensureQueryData(ytQ),
   component: YearlyTotalsPage,
 });

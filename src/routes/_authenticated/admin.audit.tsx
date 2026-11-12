@@ -13,7 +13,7 @@ const auditQ = queryOptions({
 });
 
 export const Route = createFileRoute("/_authenticated/admin/audit")({
-  head: () => ({ meta: [{ title: "செயல் பதிவு — அறம் வழிக் குழு" }] }),
+  head: () => ({ meta: [{"title": "செயல் பதிவு — அறம் வழிக் குழு"}, {"name": "description", "content": "அறம் வழிக் குழுவின் செயல்பாட்டு வரலாறு."}, {"property": "og:title", "content": "செயல் பதிவு — அறம் வழிக் குழு"}, {"property": "og:description", "content": "அறம் வழிக் குழுவின் செயல்பாட்டு வரலாறு."}, {"property": "og:type", "content": "website"}, {"name": "twitter:card", "content": "summary"}] }),
   loader: ({ context }) => context.queryClient.ensureQueryData(auditQ),
   component: AuditPage,
 });

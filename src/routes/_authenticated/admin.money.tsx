@@ -11,6 +11,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { selectCls } from "@/lib/nav";
 import { inr, fmtDate, MT_STATUS, today, errMsg } from "@/lib/format";
 import { downloadTableImage } from "@/lib/export-image";
+import { ImageDownloadDialog } from "@/components/ImageDownloadDialog";
+import { matchesImageFilters, type ImageFilters } from "@/lib/image-filters";
 
 const moneyQ = queryOptions({
   queryKey: ["money"],
@@ -18,9 +20,11 @@ const moneyQ = queryOptions({
     const [t, r, m] = await Promise.all([
       supabase.from("money_taken_status").select("*").order("taken_date", { ascending: false }),
       supabase.from("money_returned").select("*").order("payment_date", { ascending: false }),
-      supabase.from("members").select("id,full_name,member_code").eq("status", "active").order("member_code"),
+      supabase.from("members").select("id,full_name,member_code,status").order("member_code"),
     ]);
     if (t.error) throw t.error;
+    if (r.error) throw r.error;
+    if (m.error) throw m.error;
     return { taken: t.data ?? [], returned: r.data ?? [], members: m.data ?? [] };
   },
 });
@@ -36,14 +40,25 @@ function MoneyPage() {
   const { data } = useSuspenseQuery(moneyQ);
   const qc = useQueryClient();
   const [newOpen, setNewOpen] = useState(false);
+  const [imageOpen, setImageOpen] = useState(false);
   const [ret, setRet] = useState<Taken | null>(null);
   const refresh = () => qc.invalidateQueries({ queryKey: ["money"] });
   const codeOf = new Map(data.taken.map((t) => [t.id, t]));
 
+  const exportRows = (filters: ImageFilters) => data.taken.filter((t) => matchesImageFilters({
+    memberId: t.member_id,
+    date: t.taken_date,
+    amount: filters.amountField === "extra" ? t.extra_amount : filters.amountField === "total" ? t.total_to_return : filters.amountField === "returned" ? t.amount_returned : filters.amountField === "remaining" ? t.remaining : t.amount_taken,
+  }, filters));
+  const downloadImage = (filters: ImageFilters) => downloadTableImage("avk-money-taken.png", "பணம் பெற்ற விவரம் (Money Taken)", ["எண் (ID)", "உறுப்பினர் (Member)", "தேதி (Date)", "பெற்ற தொகை", "கூடுதல் தொகை", "மொத்தம் (Total)", "திரும்பியது", "மீதம் (Remaining)", "நிலை (Status)"], exportRows(filters).map((t) => [t.transaction_code, t.full_name, fmtDate(t.taken_date), inr(t.amount_taken), inr(t.extra_amount), inr(t.total_to_return), inr(t.amount_returned), inr(t.remaining), MT_STATUS[t.status ?? ""]?.ta ?? t.status]));
   return (
     <>
+      <ImageDownloadDialog open={imageOpen} onOpenChange={setImageOpen} members={data.members}
+        dateLabel="பெற்ற தேதி (Taken Date)"
+        amountFields={[{ key: "taken", label: "பெற்ற தொகை (Taken)" }, { key: "extra", label: "கூடுதல் தொகை (Extra)" }, { key: "total", label: "மொத்தம் (Total)" }, { key: "returned", label: "திரும்பியது (Returned)" }, { key: "remaining", label: "மீதம் (Remaining)" }]}
+        count={(filters) => exportRows(filters).length} download={downloadImage} />
       <PageHeader ta="பணம் பெற்ற / திரும்பச் செலுத்திய விவரம்" en="Money Taken & Returned" actions={<>
-        <Button variant="outline" onClick={() => downloadTableImage("avk-money-taken.png", "பணம் பெற்ற விவரம் (Money Taken)", ["எண் (ID)", "உறுப்பினர் (Member)", "தேதி (Date)", "பெற்ற தொகை", "கூடுதல் தொகை", "மொத்தம் (Total)", "திரும்பியது", "மீதம் (Remaining)", "நிலை (Status)"], data.taken.map((t) => [t.transaction_code, t.full_name, fmtDate(t.taken_date), inr(t.amount_taken), inr(t.extra_amount), inr(t.total_to_return), inr(t.amount_returned), inr(t.remaining), MT_STATUS[t.status ?? ""]?.ta ?? t.status]))}><Download className="size-4" /> படம் (Image)</Button>
+        <Button variant="outline" onClick={() => setImageOpen(true)}><Download className="size-4" /> படம் (Image)</Button>
         <Button onClick={() => setNewOpen(true)}><Plus className="size-4" /> புதிய பதிவு (New)</Button>
       </>} />
       <Panel title="பணம் பெற்ற விவரம்" sub="Money taken" className="mb-6">
@@ -81,7 +96,7 @@ function MoneyPage() {
         </DataTable>
       </Panel>
       <Dialog open={newOpen} onOpenChange={setNewOpen}>
-        <DialogContent>{newOpen && <TakenForm members={data.members} done={() => { setNewOpen(false); refresh(); }} />}</DialogContent>
+        <DialogContent>{newOpen && <TakenForm members={data.members.filter((m) => m.status === "active")} done={() => { setNewOpen(false); refresh(); }} />}</DialogContent>
       </Dialog>
       <Dialog open={!!ret} onOpenChange={(o) => !o && setRet(null)}>
         <DialogContent>{ret && <ReturnForm t={ret} done={() => { setRet(null); refresh(); }} />}</DialogContent>

@@ -11,6 +11,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { selectCls } from "@/lib/nav";
 import { inr, fmtDate, monthLabel, SUB_STATUS, today, errMsg, TA_MONTHS, EN_MONTHS } from "@/lib/format";
 import { downloadTableImage } from "@/lib/export-image";
+import { ImageDownloadDialog } from "@/components/ImageDownloadDialog";
+import { matchesImageFilters, subscriptionPeriodDate, type ImageFilters } from "@/lib/image-filters";
 
 const obQ = queryOptions({
   queryKey: ["obligations"],
@@ -48,6 +50,7 @@ function SubsPage() {
   const [filter, setFilter] = useState("all");
   const [pay, setPay] = useState<Ob | null>(null);
   const [edit, setEdit] = useState<Ob | null>(null);
+  const [imageOpen, setImageOpen] = useState(false);
   const refresh = () => qc.invalidateQueries({ queryKey: ["obligations"] });
   const { data: members } = useSuspenseQuery(membersQ);
   const [picked, setPicked] = useState<Set<string>>(() => new Set(members.filter((m) => m.status === "active").map((m) => m.id)));
@@ -62,10 +65,20 @@ function SubsPage() {
   }
 
   const rows = data.filter((r) => filter === "all" || r.status === filter);
+  const exportRows = (filters: ImageFilters) => rows.filter((r) => matchesImageFilters({
+    memberId: r.member_id,
+    date: subscriptionPeriodDate(r.period_year, r.period_month),
+    amount: filters.amountField === "paid" ? r.amount_paid : filters.amountField === "remaining" ? r.remaining : r.amount_due,
+  }, filters));
+  const downloadImage = (filters: ImageFilters) => downloadTableImage("avk-subscriptions.png", "சந்தா விவரம் (Subscriptions)", ["எண் (ID)", "பெயர் (Name)", "வகை (Type)", "காலம் (Period)", "தொகை (Due)", "செலுத்தியது (Paid)", "மீதம் (Remaining)", "நிலை (Status)"], exportRows(filters).map((r) => [r.member_code, r.full_name, r.payment_type === "monthly" ? "மாதம்" : "ஆண்டு", (r.payment_type === "monthly" ? monthLabel(r.period_month) + " " : "") + r.period_year, inr(r.amount_due), inr(r.amount_paid), inr(r.remaining), SUB_STATUS[r.status ?? ""]?.ta ?? r.status]));
   return (
     <>
+      <ImageDownloadDialog open={imageOpen} onOpenChange={setImageOpen} members={members}
+        dateLabel="சந்தா காலத் தேதி (Subscription Period Date)"
+        amountFields={[{ key: "due", label: "தொகை (Due)" }, { key: "paid", label: "செலுத்தியது (Paid)" }, { key: "remaining", label: "மீதம் (Remaining)" }]}
+        count={(filters) => exportRows(filters).length} download={downloadImage} />
       <PageHeader ta="சந்தா" en="Subscriptions" actions={
-        <Button variant="outline" onClick={() => downloadTableImage("avk-subscriptions.png", "சந்தா விவரம் (Subscriptions)", ["எண் (ID)", "பெயர் (Name)", "வகை (Type)", "காலம் (Period)", "தொகை (Due)", "செலுத்தியது (Paid)", "மீதம் (Remaining)", "நிலை (Status)"], rows.map((r) => [r.member_code, r.full_name, r.payment_type === "monthly" ? "மாதம்" : "ஆண்டு", (r.payment_type === "monthly" ? monthLabel(r.period_month) + " " : "") + r.period_year, inr(r.amount_due), inr(r.amount_paid), inr(r.remaining), SUB_STATUS[r.status ?? ""]?.ta ?? r.status]))}>
+        <Button variant="outline" onClick={() => setImageOpen(true)}>
           <Download className="size-4" /> படம் (Image)
         </Button>} />
       <Panel title="சந்தா உருவாக்கு" sub="Generate dues for all active members" className="mb-6">

@@ -36,6 +36,13 @@
       "when": 1792292449234,
       "tag": "0004_generate_obligations_for_members",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1795440239696,
+      "tag": "0005_split_financial_accounts",
+      "breakpoints": true
     }
   ]
 }

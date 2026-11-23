@@ -68,6 +68,50 @@ export type Database = {
         }
         Relationships: []
       }
+      extra_expenses: {
+        Row: {
+          amount: number
+          created_at: string
+          description: string
+          expense_code: string
+          expense_date: string
+          expense_year: number | null
+          id: string
+          member_id: string | null
+          recorded_by: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          description: string
+          expense_code: string
+          expense_date: string
+          expense_year?: number | null
+          id?: string
+          member_id?: string | null
+          recorded_by?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          description?: string
+          expense_code?: string
+          expense_date?: string
+          expense_year?: number | null
+          id?: string
+          member_id?: string | null
+          recorded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "extra_expenses_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       members: {
         Row: {
           auth_user_id: string | null
@@ -76,6 +120,7 @@ export type Database = {
           id: string
           joined_on: string | null
           member_code: string
+          mobile: string | null
           must_change_password: boolean
           status: Database["public"]["Enums"]["member_status"]
           updated_at: string
@@ -88,6 +133,7 @@ export type Database = {
           id?: string
           joined_on?: string | null
           member_code: string
+          mobile?: string | null
           must_change_password?: boolean
           status?: Database["public"]["Enums"]["member_status"]
           updated_at?: string
@@ -100,6 +146,7 @@ export type Database = {
           id?: string
           joined_on?: string | null
           member_code?: string
+          mobile?: string | null
           must_change_password?: boolean
           status?: Database["public"]["Enums"]["member_status"]
           updated_at?: string
@@ -112,10 +159,13 @@ export type Database = {
           amount_returned: number
           created_at: string
           id: string
+          interest_amount: number
           member_id: string
           money_taken_id: string
           notes: string | null
           payment_date: string
+          payment_year: number | null
+          principal_returned: number
           recorded_by: string | null
           return_code: string
         }
@@ -123,10 +173,13 @@ export type Database = {
           amount_returned: number
           created_at?: string
           id?: string
+          interest_amount?: number
           member_id: string
           money_taken_id: string
           notes?: string | null
           payment_date: string
+          payment_year?: number | null
+          principal_returned?: number
           recorded_by?: string | null
           return_code: string
         }
@@ -134,10 +187,13 @@ export type Database = {
           amount_returned?: number
           created_at?: string
           id?: string
+          interest_amount?: number
           member_id?: string
           money_taken_id?: string
           notes?: string | null
           payment_date?: string
+          payment_year?: number | null
+          principal_returned?: number
           recorded_by?: string | null
           return_code?: string
         }
@@ -175,6 +231,7 @@ export type Database = {
           notes: string | null
           recorded_by: string | null
           taken_date: string
+          taken_year: number | null
           total_to_return: number | null
           transaction_code: string
         }
@@ -187,6 +244,7 @@ export type Database = {
           notes?: string | null
           recorded_by?: string | null
           taken_date: string
+          taken_year?: number | null
           total_to_return?: number | null
           transaction_code: string
         }
@@ -199,6 +257,7 @@ export type Database = {
           notes?: string | null
           recorded_by?: string | null
           taken_date?: string
+          taken_year?: number | null
           total_to_return?: number | null
           transaction_code?: string
         }
@@ -258,6 +317,7 @@ export type Database = {
           notes: string | null
           obligation_id: string
           payment_date: string
+          payment_year: number | null
           receipt_code: string
           recorded_by: string | null
         }
@@ -268,6 +328,7 @@ export type Database = {
           notes?: string | null
           obligation_id: string
           payment_date: string
+          payment_year?: number | null
           receipt_code: string
           recorded_by?: string | null
         }
@@ -278,6 +339,7 @@ export type Database = {
           notes?: string | null
           obligation_id?: string
           payment_date?: string
+          payment_year?: number | null
           receipt_code?: string
           recorded_by?: string | null
         }
@@ -403,6 +465,22 @@ export type Database = {
     }
     Functions: {
       current_member_id: { Args: never; Returns: string }
+      delete_extra_expense: {
+        Args: { _expense_id: string }
+        Returns: undefined
+      }
+      delete_money_returned: {
+        Args: { _money_returned_id: string }
+        Returns: undefined
+      }
+      delete_money_taken: {
+        Args: { _money_taken_id: string }
+        Returns: undefined
+      }
+      delete_subscription_receipt: {
+        Args: { _receipt_id: string }
+        Returns: undefined
+      }
       generate_obligations: {
         Args: {
           _month?: number
@@ -433,12 +511,31 @@ export type Database = {
         Returns: string
       }
       next_member_code: { Args: never; Returns: string }
+      record_extra_expense: {
+        Args: {
+          _amount: number
+          _date: string
+          _description: string
+          _member_id: string
+        }
+        Returns: string
+      }
       record_money_returned: {
         Args: {
           _amount: number
           _date: string
           _money_taken_id: string
           _notes: string
+        }
+        Returns: string
+      }
+      record_money_returned_split: {
+        Args: {
+          _date: string
+          _interest_amount: number
+          _money_taken_id: string
+          _notes: string
+          _principal_amount: number
         }
         Returns: string
       }
@@ -461,6 +558,37 @@ export type Database = {
         }
         Returns: string
       }
+      update_extra_expense: {
+        Args: {
+          _amount: number
+          _date: string
+          _description: string
+          _expense_id: string
+          _member_id: string
+        }
+        Returns: undefined
+      }
+      update_money_returned: {
+        Args: {
+          _date: string
+          _interest_amount: number
+          _money_returned_id: string
+          _notes: string
+          _principal_amount: number
+        }
+        Returns: undefined
+      }
+      update_money_taken: {
+        Args: {
+          _amount: number
+          _date: string
+          _extra: number
+          _member_id: string
+          _money_taken_id: string
+          _notes: string
+        }
+        Returns: undefined
+      }
       update_obligation_amount: {
         Args: { _amount: number; _obligation_id: string }
         Returns: undefined
@@ -471,6 +599,15 @@ export type Database = {
       }
       update_settings: {
         Args: { _monthly: number; _yearly: number }
+        Returns: undefined
+      }
+      update_subscription_receipt: {
+        Args: {
+          _amount: number
+          _date: string
+          _notes: string
+          _receipt_id: string
+        }
         Returns: undefined
       }
       write_audit: {

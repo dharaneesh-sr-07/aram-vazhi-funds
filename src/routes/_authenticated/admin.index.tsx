@@ -1,73 +1,109 @@
+import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
-import { Users, Wallet, HandCoins, AlertCircle } from "lucide-react";
+import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { AlertCircle, ArrowDownToLine, ArrowUpFromLine, HandCoins, Receipt, Users, Wallet } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { PageHeader, StatCard, Panel, DataTable, Th, StatusPill } from "@/components/ui-kit";
-import { inr, fmtDate, MT_STATUS } from "@/lib/format";
-import { calculateFundBalance } from "@/lib/fund-balance";
+import { PageHeader, Panel, StatCard, DataTable, Th } from "@/components/ui-kit";
+import { inr, fmtDate, monthLabel } from "@/lib/format";
+import { selectCls } from "@/lib/nav";
+import { asFinanceObligations, calculateFinanceSummary } from "@/lib/finance-summary";
 
-const dashQ = queryOptions({
-  queryKey: ["admin-dash"],
+const financeQ = queryOptions({
+  queryKey: ["admin-finance"],
   queryFn: async () => {
-    const [m, ob, mt] = await Promise.all([
-      supabase.from("members").select("id,status"),
-      supabase.from("obligation_status").select("amount_due,amount_paid,remaining"),
-      supabase.from("money_taken_status").select("*").order("taken_date", { ascending: false }),
+    const [members, obligations, receipts, moneyTaken, moneyReturned, expenses] = await Promise.all([
+      supabase.from("members").select("id,member_code,full_name,status,joined_on,created_at").order("member_code"),
+      supabase.from("obligation_status").select("id,member_id,payment_type,period_month,period_year,amount_due,amount_paid"),
+      supabase.from("subscription_receipts").select("obligation_id,amount_paid,payment_date"),
+      supabase.from("money_taken").select("id,member_id,taken_date,amount_taken").order("taken_date", { ascending: false }),
+      supabase.from("money_returned").select("money_taken_id,payment_date,principal_returned,interest_amount"),
+      supabase.from("extra_expenses").select("expense_date,amount"),
     ]);
-    if (m.error) throw m.error;
-    if (ob.error) throw ob.error;
-    if (mt.error) throw mt.error;
-    const sum = (a: { [k: string]: unknown }[] | null, k: string) => (a ?? []).reduce((s, r) => s + Number(r[k] ?? 0), 0);
-    const collected = sum(ob.data, "amount_paid");
-    const balance = calculateFundBalance(collected, mt.data ?? []);
+    if (members.error) throw members.error;
+    if (obligations.error) throw obligations.error;
+    if (receipts.error) throw receipts.error;
+    if (moneyTaken.error) throw moneyTaken.error;
+    if (moneyReturned.error) throw moneyReturned.error;
+    if (expenses.error) throw expenses.error;
     return {
-      active: (m.data ?? []).filter((x) => x.status === "active").length,
-      total: m.data?.length ?? 0,
-      collected,
-      extra: balance.extra,
-      grand: balance.total,
-      pendingSubs: sum(ob.data, "remaining"),
-      outstanding: sum(mt.data, "remaining"),
-      recent: (mt.data ?? []).slice(0, 8),
+      members: members.data ?? [],
+      obligations: asFinanceObligations(obligations.data ?? []),
+      receipts: receipts.data ?? [],
+      moneyTaken: moneyTaken.data ?? [],
+      moneyReturned: moneyReturned.data ?? [],
+      expenses: expenses.data ?? [],
     };
   },
 });
 
 export const Route = createFileRoute("/_authenticated/admin/")({
-  head: () => ({ meta: [{"title": "நிர்வாகி முகப்பு — அறம் வழிக் குழு"}, {"name": "description", "content": "அறம் வழிக் குழுவின் நிர்வாக நிதிச் சுருக்கம்."}, {"property": "og:title", "content": "நிர்வாகி முகப்பு — அறம் வழிக் குழு"}, {"property": "og:description", "content": "அறம் வழிக் குழுவின் நிர்வாக நிதிச் சுருக்கம்."}, {"property": "og:type", "content": "website"}, {"name": "twitter:card", "content": "summary"}] }),
-  loader: ({ context }) => context.queryClient.ensureQueryData(dashQ),
+  head: () => ({ meta: [{ title: "நிர்வாகி முகப்பு — அறம் வழிக் குழு" }, { name: "description", content: "மாத சந்தா, புடவைப் பணம் மற்றும் கூடுதல் வட்டி கணக்குகளின் ஆண்டு வாரியான நிர்வாகச் சுருக்கம்." }, { property: "og:title", content: "நிர்வாகி முகப்பு — அறம் வழிக் குழு" }, { property: "og:description", content: "மாத சந்தா, புடவைப் பணம் மற்றும் கூடுதல் வட்டி கணக்குகளின் ஆண்டு வாரியான நிர்வாகச் சுருக்கம்." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
+  loader: ({ context }) => context.queryClient.ensureQueryData(financeQ),
   component: AdminHome,
 });
 
 function AdminHome() {
   const { me } = Route.useRouteContext();
-  const { data } = useSuspenseQuery(dashQ);
+  const { data } = useSuspenseQuery(financeQ);
+  const [year, setYear] = useState(new Date().getFullYear());
+  const summary = calculateFinanceSummary({ ...data, year });
+  const currentYear = new Date().getFullYear();
+  const years = Array.from(new Set([
+    ...Array.from({ length: 6 }, (_, index) => currentYear - index),
+    ...data.obligations.map((row) => row.period_year),
+  ])).sort((a, b) => b - a);
+  const memberNames = new Map(data.members.map((member) => [member.id, member.full_name]));
+  const recentTaken = data.moneyTaken.filter((row) => Number(row.taken_date.slice(0, 4)) === year).slice(0, 8);
+
   return (
     <>
-      <PageHeader ta="நிர்வாகி முகப்பு" en={`Admin Dashboard · ${me.fullName}`} />
+      <PageHeader
+        ta="நிர்வாகி முகப்பு"
+        en={`Admin Dashboard · ${me.fullName}`}
+        actions={
+          <label className="flex min-w-48 items-center gap-2 text-sm font-medium">
+            <span className="whitespace-nowrap">நிதியாண்டு (Year)</span>
+            <select className={selectCls} value={year} onChange={(event) => setYear(Number(event.target.value))}>
+              {years.map((value) => <option key={value} value={value}>{value}</option>)}
+            </select>
+          </label>
+        }
+      />
+
       <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        <StatCard icon={Users} ta="செயலில் உறுப்பினர்கள்" en={`Active members (of ${data.total})`} value={data.active} />
-        <StatCard icon={Wallet} ta="மொத்த தொகை" en="Total amount (after money taken & returned)" value={inr(data.grand)} />
-        <StatCard icon={Wallet} ta="வசூலான சந்தா" en="Subscriptions collected" value={inr(data.collected)} />
-        <StatCard icon={HandCoins} ta="கூடுதல் தொகை" en="Extra amount" value={inr(data.extra)} tone="gold" />
-        <StatCard icon={AlertCircle} ta="நிலுவை சந்தா" en="Pending subscriptions" value={inr(data.pendingSubs)} tone="danger" />
-        <StatCard icon={HandCoins} ta="திருப்ப வேண்டியது" en="Outstanding to return" value={inr(data.outstanding)} tone="gold" />
+        <StatCard icon={Users} ta="மொத்த உறுப்பினர்கள்" en="Total members" value={summary.totalMembers} />
+        <StatCard icon={Receipt} ta="மாத சந்தா வசூல்" en={`${year} · Monthly subscription collected`} value={inr(summary.monthlyCollected)} />
+        <StatCard icon={AlertCircle} ta="மாத சந்தா வேண்டியது" en="Monthly subscription pending" value={inr(summary.monthlyPending)} tone="danger" />
+        <StatCard icon={Wallet} ta="புடவைப் பணம் வசூல்" en={`${year} · Saree fund collected`} value={inr(summary.sareeCollected)} />
+        <StatCard icon={Wallet} ta="புடவைப் பண இருப்பு" en={`Available Saree Fund · ${year} year-end`} value={inr(summary.sareeAvailable)} />
+        <StatCard icon={ArrowDownToLine} ta="புடவைப் பணம் கொடுத்தது" en={`${year} · Saree fund given`} value={inr(summary.sareeGiven)} />
+        <StatCard icon={ArrowUpFromLine} ta="அசல் தொகை திரும்பியது" en={`${year} · Original amount returned`} value={inr(summary.sareeReturned)} />
+        <StatCard icon={HandCoins} ta="கூடுதல் வட்டி வசூல்" en={`Interest collected · Extra balance ${inr(summary.extraBalance)}`} value={inr(summary.extraCollected)} tone="gold" />
+        <StatCard icon={AlertCircle} ta="புடவைப் பணம் நிலுவை" en={`Pending Saree Fund returns · ${year} year-end`} value={inr(summary.sareePending)} tone="danger" />
       </div>
-      <Panel title="சமீபத்திய பணம் பெற்ற விவரம்" sub="Recent money taken">
-        <DataTable empty={data.recent.length === 0} head={[<Th ta="குறியீடு" en="Code" />, <Th ta="உறுப்பினர்" en="Member" />, <Th ta="தேதி" en="Date" />, <Th ta="மொத்தம்" en="Total" />, <Th ta="மீதம்" en="Remaining" />, <Th ta="நிலை" en="Status" />]}>
-          {data.recent.map((r) => {
-            const s = MT_STATUS[r.status ?? "active"];
-            return (
-              <tr key={r.id}>
-                <td className="font-mono text-xs">{r.transaction_code}</td>
-                <td>{r.full_name}</td>
-                <td>{fmtDate(r.taken_date)}</td>
-                <td className="tabular-nums">{inr(r.total_to_return)}</td>
-                <td className="tabular-nums">{inr(r.remaining)}</td>
-                <td><StatusPill tone={s?.tone ?? "muted"}>{s?.ta} ({s?.en})</StatusPill></td>
-              </tr>
-            );
-          })}
+
+      <Panel title={`${year} மாத சந்தா நிலுவை`} sub="Unpaid months and amount for each member" className="mb-6">
+        <DataTable empty={summary.monthlyDues.length === 0} head={[<Th ta="உறுப்பினர்" en="Member" />, <Th ta="செலுத்தாத மாதங்கள்" en="Unpaid months" />, <Th ta="நிலுவை" en="Pending amount" />]}>
+          {summary.monthlyDues.map((row) => (
+            <tr key={row.memberId}>
+              <td><span className="font-medium">{row.memberName}</span> <span className="font-mono text-xs text-muted-foreground">{row.memberCode}</span></td>
+              <td>{row.unpaidMonths.length ? row.unpaidMonths.map(monthLabel).join(" · ") : "நிலுவை இல்லை (Clear)"}</td>
+              <td className="tabular-nums">{inr(row.pendingAmount)}</td>
+            </tr>
+          ))}
+        </DataTable>
+      </Panel>
+
+      <Panel title="பணம் கொடுத்த பதிவுகள்" sub={`${year} · Saree fund given`}>
+        <DataTable empty={recentTaken.length === 0} head={[<Th ta="உறுப்பினர்" en="Member" />, <Th ta="தேதி" en="Date" />, <Th ta="அசல் தொகை" en="Principal given" />, <Th ta="குறிப்பு" en="Description" />]}>
+          {recentTaken.map((row) => (
+            <tr key={row.id}>
+              <td>{memberNames.get(row.member_id) ?? "—"}</td>
+              <td>{fmtDate(row.taken_date)}</td>
+              <td className="tabular-nums">{inr(row.amount_taken)}</td>
+              <td className="text-muted-foreground">{row.notes ?? "—"}</td>
+            </tr>
+          ))}
         </DataTable>
       </Panel>
     </>

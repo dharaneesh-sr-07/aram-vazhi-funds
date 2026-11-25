@@ -15,7 +15,7 @@ const financeQ = queryOptions({
       supabase.from("members").select("id,member_code,full_name,status,joined_on,created_at").order("member_code"),
       supabase.from("obligation_status").select("id,member_id,payment_type,period_month,period_year,amount_due,amount_paid"),
       supabase.from("subscription_receipts").select("obligation_id,amount_paid,payment_date"),
-      supabase.from("money_taken").select("id,member_id,taken_date,amount_taken").order("taken_date", { ascending: false }),
+      supabase.from("money_taken").select("id,member_id,taken_date,amount_taken,notes").order("taken_date", { ascending: false }),
       supabase.from("money_returned").select("money_taken_id,payment_date,principal_returned,interest_amount"),
       supabase.from("extra_expenses").select("expense_date,amount"),
     ]);

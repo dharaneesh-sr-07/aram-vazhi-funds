@@ -24,7 +24,7 @@ const obQ = queryOptions({
     return data ?? [];
   },
 });
-type Ob = Awaited<ReturnType<typeof obQ.queryFn>>[number];
+type Ob = Awaited<ReturnType<NonNullable<typeof obQ.queryFn>>>[number];
 
 const membersQ = queryOptions({
   queryKey: ["members-pick"],
@@ -44,7 +44,7 @@ const receiptsQ = queryOptions({
     return data ?? [];
   },
 });
-type Receipt = Awaited<ReturnType<typeof receiptsQ.queryFn>>[number];
+type Receipt = Awaited<ReturnType<NonNullable<typeof receiptsQ.queryFn>>>[number];
 
 export const Route = createFileRoute("/_authenticated/admin/subscriptions")({
   head: () => ({ meta: [{ title: "சந்தா — அறம் வழிக் குழு" }, { name: "description", content: "மாத சந்தா மற்றும் புடவைப் பணம் வசூல், நிலுவை மாதங்கள் மற்றும் ரசீது வரலாறு." }, { property: "og:title", content: "சந்தா — அறம் வழிக் குழு" }, { property: "og:description", content: "மாத சந்தா மற்றும் புடவைப் பணம் வசூல், நிலுவை மாதங்கள் மற்றும் ரசீது வரலாறு." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
@@ -211,7 +211,7 @@ function SubsPage() {
       }>
         <DataTable empty={rows.length === 0} head={[<Th ta="உறுப்பினர்" en="Member" />, <Th ta="வகை" en="Type" />, <Th ta="காலம்" en="Period" />, <Th ta="தொகை" en="Due" />, <Th ta="செலுத்தியது" en="Paid" />, <Th ta="மீதம்" en="Remaining" />, <Th ta="நிலை" en="Status" />, ""]}>
           {rows.map((row) => {
-            const status = SUB_STATUS[row.status ?? "pending"] ?? SUB_STATUS.pending;
+            const status = SUB_STATUS[row.status ?? "pending"] ?? { ta: "நிலுவையில்", en: "Pending", tone: "muted" as const };
             return (
               <tr key={row.id ?? `${row.member_id}-${row.period_year}-${row.period_month}`}>
                 <td><span className="font-medium">{row.full_name}</span> <span className="font-mono text-xs text-muted-foreground">{row.member_code}</span></td>
